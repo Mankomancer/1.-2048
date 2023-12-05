@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Microsoft.Unity.VisualStudio.Editor;
 using TMPro; //to use text mesh pro
 
 public class UIScripts : MonoBehaviour

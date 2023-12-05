@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42a93e2ad67c3804dbad3f2a36dc3946, type: 3}
   m_Name: New Fun Fact 3
   m_EditorClassIdentifier: 
-  funFact: 
+  funFact: Fun is a relative term
