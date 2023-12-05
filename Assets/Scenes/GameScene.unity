@@ -1387,7 +1387,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 697270053}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1897174164}
+        m_TargetAssemblyTypeName: GameController, Assembly-CSharp
+        m_MethodName: NewGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &697270053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2913,6 +2925,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2124807666}
+  - component: {fileID: 2124807667}
   m_Layer: 0
   m_Name: Tiles
   m_TagString: Untagged
@@ -2929,12 +2942,43 @@ Transform:
   m_GameObject: {fileID: 2124807665}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -264.8063, y: 261.04416, z: 0}
+  m_LocalPosition: {x: -262.8063, y: 265.0442, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 669340037}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2124807667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124807665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d96374163c8d69f4691a380471a47dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentObject: {fileID: 2124807665}
+  tile2: {fileID: 2539181345263130123, guid: aceaedd0c5e6c7b4784b4f2f1a5a2b3f, type: 3}
+  cells:
+  - {fileID: 1217474924}
+  - {fileID: 653219210}
+  - {fileID: 1910003770}
+  - {fileID: 684288357}
+  - {fileID: 780084200}
+  - {fileID: 875412650}
+  - {fileID: 777762546}
+  - {fileID: 416133678}
+  - {fileID: 569860976}
+  - {fileID: 1260365810}
+  - {fileID: 1439303768}
+  - {fileID: 363148757}
+  - {fileID: 2063374061}
+  - {fileID: 376101033}
+  - {fileID: 1887355984}
+  - {fileID: 185355472}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
