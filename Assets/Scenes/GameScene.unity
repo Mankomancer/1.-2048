@@ -2975,8 +2975,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentObject: {fileID: 2124807665}
-  tile2: {fileID: 2539181345263130123, guid: aceaedd0c5e6c7b4784b4f2f1a5a2b3f, type: 3}
   playerControls: {fileID: 1897174163}
+  tilePrefabs:
+  - {fileID: 2539181345263130123, guid: aceaedd0c5e6c7b4784b4f2f1a5a2b3f, type: 3}
+  - {fileID: 2903106950429786287, guid: 674a8e9e831ddd24eaae3c3d81ea1e6b, type: 3}
+  - {fileID: 2003746506287070480, guid: fc3cf1a62a48e504582edd5b2af3d109, type: 3}
+  - {fileID: 5262666241067326191, guid: c2196f6ce5c52d144b540b9f5e08aaaf, type: 3}
+  - {fileID: 8714833203943269993, guid: ba9ca30c93d08f7438294a9f3c4c86ba, type: 3}
+  - {fileID: 8836263866727468945, guid: 4bdcb71002ea8d34188025df0a2e9d18, type: 3}
+  - {fileID: 8100122394983041236, guid: eb78e46e3e3e4824982be96edd003077, type: 3}
+  - {fileID: 592320818994628189, guid: fac75ed0ad2030b43a9e75fe0c628429, type: 3}
+  - {fileID: 57512284524799149, guid: 73c9483757546964d92b8d0972ccd446, type: 3}
+  - {fileID: 7547070666872172252, guid: f20feff78e7701e4d9f083b772b029b9, type: 3}
+  - {fileID: 4632849224154080530, guid: 1a4c688dd97007446984ef6e64912ad2, type: 3}
   cells:
   - {fileID: 1217474924}
   - {fileID: 653219210}

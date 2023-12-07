@@ -19,7 +19,7 @@ public class PlayerControls : MonoBehaviour
     {
         if (AllowPlayerControl){
             if (Input.GetKeyUp(KeyCode.W)){ //GetKeyUp is used, so doesnt accept input command all the time
-                AllowPlayerControl=false;
+                AllowPlayerControl=false;   //disabling it so player cant spam commands
                 GameObject.FindAnyObjectByType<TilesManager>().MoveUp();
             }
             else if(Input.GetKeyUp(KeyCode.D)){
