@@ -26,6 +26,8 @@ public class TilesManager : MonoBehaviour
     int valueInTheNewTile=0;
     GameObject mergedTile;
     bool allowedTurn = false; //if player tries to move but no movement happens, then tile will not spawn
+    bool needToMoveTwoTiles=false;
+    bool needToMoveThreeTiles=false;
 
 
     void Start()
@@ -70,7 +72,6 @@ public class TilesManager : MonoBehaviour
         spawnedTiles[randomNumber] = tileSpawn;
         valuesInTiles[randomNumber]= 2;
         fieldRepresenter[randomNumber]=false;
-        Debug.Log(randomNumber);
     }
 
     /*
@@ -100,26 +101,49 @@ public class TilesManager : MonoBehaviour
                 destinationTile=j+i*4;  
                 movingTile=j-1+i*4;
 
+                if (j==2){  //in case if possible that CAN move 2 field instead of 1.
+                    CheckTwoTilesMovement(destinationTile+1,movingTile);
+                }
+                else if(j==1){  //in case if possible that CAN move 2 or even 3 fields instead of 1
+                    CheckTwoTilesMovement(destinationTile+1,movingTile);
+                    CheckThreeTilesMovement(destinationTile+2,movingTile);
+                }
+
                 if (!spawnedTiles[destinationTile] && spawnedTiles[movingTile]){ //destination tile needs to be empty, moving tile needs to exists
+                    if (needToMoveThreeTiles && needToMoveTwoTiles){
+                        destinationTile=destinationTile+2;
+                    }
+                    else if (needToMoveTwoTiles && !needToMoveThreeTiles){
+                        destinationTile=destinationTile+1;
+                    }
+                    
+
                     UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
                     TilesMover(destinationTile, movingTile);
                     spawnedTiles[destinationTile].transform.position=newCellPosition;
                     allowedTurn=true;
                 }
                 else if (spawnedTiles[destinationTile] && spawnedTiles[movingTile] && valuesInTiles[movingTile]==valuesInTiles[destinationTile]){
+                    if (needToMoveThreeTiles && needToMoveTwoTiles){
+                        destinationTile=destinationTile+2;
+                    }
+                    else if (needToMoveTwoTiles && !needToMoveThreeTiles){
+                        destinationTile=destinationTile+1;
+                    }
+
+                    Debug.Log("destination number: " +destinationTile + ". Move tile IS : " +movingTile );
                     UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
                     TileMerger(valuesInTiles[destinationTile]);//selects prefab for next merged tile - it is saved in mergedTile
-                    valueInTheNewTile=valuesInTiles[destinationTile]*2;    //Tile merger replaces the value, but it doesnt combine it, so we do it manually
-                    DestroyTileInfo(destinationTile);
+                    valueInTheNewTile=valuesInTiles[destinationTile]*2;    //save the new tiles value
+                    DestroyTileInfo(destinationTile);   //we dont need old tiles anymore
                     DestroyTileInfo(movingTile);
                     
                     tileSpawn = Instantiate(mergedTile, newCellPosition, UnityEngine.Quaternion.identity,parentObject.transform);
-                    spawnedTiles[destinationTile] = tileSpawn;
-                    valuesInTiles[destinationTile]= valueInTheNewTile;
-                    fieldRepresenter[destinationTile]=false;
-                    tileProcessed[destinationTile]=true;
+                    SetTilesInfo(destinationTile);
                     allowedTurn=true;
                 }
+                needToMoveThreeTiles=false;
+                needToMoveTwoTiles=false;
             }
         }
 
@@ -148,7 +172,7 @@ public class TilesManager : MonoBehaviour
         playerControls.GetComponent<PlayerControls>().AllowPlayerControl=true;
     }
 
-    public void TilesMover(int destination, int mover){
+    void TilesMover(int destination, int mover){
         spawnedTiles[destination]=spawnedTiles[mover];
         spawnedTiles[mover]=null;
                     
@@ -160,7 +184,21 @@ public class TilesManager : MonoBehaviour
         tileProcessed[destination]=true;
     }
 
-    public void TileMerger(int previousNumber){
+    void CheckTwoTilesMovement(int destination, int mover){ //this doesnt check if tiles between destination are fine, just using to check end points
+        needToMoveTwoTiles=false;
+        if ((fieldRepresenter[destination]) || (valuesInTiles[destination]==valuesInTiles[mover] && !tileProcessed[destination])){ //either end destination need to be emtpy OR it needs to match in value with current tile
+            needToMoveTwoTiles=true;
+        } 
+    }
+
+    void CheckThreeTilesMovement(int destination, int mover){   //this doesnt check if tiles between destination are fine
+        needToMoveThreeTiles=false;
+        if ((fieldRepresenter[destination]) || (valuesInTiles[destination]==valuesInTiles[mover] && !tileProcessed[destination])){
+            needToMoveThreeTiles=true;
+        } 
+    }
+
+    void TileMerger(int previousNumber){
         previousNumber=previousNumber*2;
         if (previousNumber==2){
             mergedTile=tilePrefabs[0];
@@ -203,6 +241,13 @@ public class TilesManager : MonoBehaviour
         valuesInTiles[tileNumber]=0;
         fieldRepresenter[tileNumber]=true;
         tileProcessed[tileNumber]=false;
+    }
+
+    void SetTilesInfo(int tileNumber){
+        spawnedTiles[tileNumber] = tileSpawn;
+        valuesInTiles[tileNumber]= valueInTheNewTile;
+        fieldRepresenter[tileNumber]=false;
+        tileProcessed[tileNumber]=true;
     }
 
 
