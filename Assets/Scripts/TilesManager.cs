@@ -109,21 +109,9 @@ public class TilesManager : MonoBehaviour
                     CheckThreeTilesMovement(destinationTile+2,movingTile);
                 }
 
-                if (!spawnedTiles[destinationTile] && spawnedTiles[movingTile]){ //destination tile needs to be empty, moving tile needs to exists
-                    if (needToMoveThreeTiles && needToMoveTwoTiles){
-                        destinationTile=destinationTile+2;
-                    }
-                    else if (needToMoveTwoTiles && !needToMoveThreeTiles){
-                        destinationTile=destinationTile+1;
-                    }
-                    
 
-                    UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
-                    TilesMover(destinationTile, movingTile);
-                    spawnedTiles[destinationTile].transform.position=newCellPosition;
-                    allowedTurn=true;
-                }
-                else if (spawnedTiles[destinationTile] && spawnedTiles[movingTile] && valuesInTiles[movingTile]==valuesInTiles[destinationTile]){
+
+                if ((!spawnedTiles[destinationTile] && spawnedTiles[movingTile]) || (spawnedTiles[destinationTile] && spawnedTiles[movingTile])){ //destination tile needs to be empty, moving tile needs to exists
                     if (needToMoveThreeTiles && needToMoveTwoTiles){
                         destinationTile=destinationTile+2;
                     }
@@ -131,17 +119,29 @@ public class TilesManager : MonoBehaviour
                         destinationTile=destinationTile+1;
                     }
 
-                    Debug.Log("destination number: " +destinationTile + ". Move tile IS : " +movingTile );
-                    UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
-                    TileMerger(valuesInTiles[destinationTile]);//selects prefab for next merged tile - it is saved in mergedTile
-                    valueInTheNewTile=valuesInTiles[destinationTile]*2;    //save the new tiles value
-                    DestroyTileInfo(destinationTile);   //we dont need old tiles anymore
-                    DestroyTileInfo(movingTile);
+                    if (valuesInTiles[movingTile]==valuesInTiles[destinationTile]){ //i know this if and else if is a bit redundant, but i am too lazy atm to bother "optimise" it. especially for this kind of small game where it will not matter
+                        UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
+                        TileMerger(valuesInTiles[destinationTile]);//selects prefab for next merged tile - it is saved in mergedTile
+                        valueInTheNewTile=valuesInTiles[destinationTile]*2;    //save the new tiles value
+                        DestroyTileInfo(destinationTile);   //we dont need old tiles anymore
+                        DestroyTileInfo(movingTile);
                     
-                    tileSpawn = Instantiate(mergedTile, newCellPosition, UnityEngine.Quaternion.identity,parentObject.transform);
-                    SetTilesInfo(destinationTile);
-                    allowedTurn=true;
+                        tileSpawn = Instantiate(mergedTile, newCellPosition, UnityEngine.Quaternion.identity,parentObject.transform);
+                        SetTilesInfo(destinationTile);
+                        allowedTurn=true;
+
+                    }
+                    else if((!spawnedTiles[destinationTile] && spawnedTiles[movingTile])){
+                        UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
+                        TilesMover(destinationTile, movingTile);
+                        spawnedTiles[destinationTile].transform.position=newCellPosition;
+                        allowedTurn=true;
+                    }
                 }
+
+
+
+
                 needToMoveThreeTiles=false;
                 needToMoveTwoTiles=false;
             }
