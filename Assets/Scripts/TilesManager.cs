@@ -13,16 +13,19 @@ public class TilesManager : MonoBehaviour
 
 
     //Could use this to get coordinates for spawn points
-    [SerializeField] GameObject[] cells;
-    bool[] fieldRepresenter = new bool [16]; //field count.  true - fillable, false - not fillable
-    int[] valuesInTiles = new int [16]; //to store values, so can use them to check if can merge them
-    GameObject[] spawnedTiles = new GameObject[16]; //store spawned and combined tiles here
+    [SerializeField] GameObject[] cells;  //DELETE SERIALIZED FIELD FOR EVERYONE EXCEPT THIS ONE
+    [SerializeField] bool[] fieldRepresenter = new bool [16]; //field count.  true - fillable, false - not fillable
+    [SerializeField] bool[] tileProcessed = new bool [16]; //field count.  true - this tile already did action this turn, false - this tile hasnt been processed yet
+    [SerializeField] int[] valuesInTiles = new int [16]; //to store values, so can use them to check if can merge them
+    [SerializeField] GameObject[] spawnedTiles = new GameObject[16]; //store spawned and combined tiles here
     int randomNumber;
-    GameObject tileSpawn;
+    [SerializeField] GameObject tileSpawn; //used to store which prefab to use
 
     int destinationTile;
     int movingTile;
+    int valueInTheNewTile=0;
     GameObject mergedTile;
+    bool allowedTurn = false; //if player tries to move but no movement happens, then tile will not spawn
 
 
     void Start()
@@ -30,6 +33,7 @@ public class TilesManager : MonoBehaviour
         for (int i = 0; i<=15; i++){    //fill with default "empty" value
             fieldRepresenter[i]=true;
             valuesInTiles[i]=0;
+            tileProcessed[i]=false;
         }
         SpawnTile();
 
@@ -66,6 +70,7 @@ public class TilesManager : MonoBehaviour
         spawnedTiles[randomNumber] = tileSpawn;
         valuesInTiles[randomNumber]= 2;
         fieldRepresenter[randomNumber]=false;
+        Debug.Log(randomNumber);
     }
 
     /*
@@ -86,34 +91,42 @@ public class TilesManager : MonoBehaviour
 
     public void MoveRight(){
         
+        for (int i=0; i<16; i++){     //reset values for each row. if false then means that can still manipulate this tile
+                tileProcessed[i]=false;
+        }
+
         for (int i=0; i<4; i++){    //need to use i*4 - represents which line is used
             for (int j = 3; j>0; j--){
-                destinationTile=j+i*4;
+                destinationTile=j+i*4;  
                 movingTile=j-1+i*4;
+
                 if (!spawnedTiles[destinationTile] && spawnedTiles[movingTile]){ //destination tile needs to be empty, moving tile needs to exists
-                    
                     UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
                     TilesMover(destinationTile, movingTile);
                     spawnedTiles[destinationTile].transform.position=newCellPosition;
+                    allowedTurn=true;
                 }
-                else if (!spawnedTiles[destinationTile] && !spawnedTiles[movingTile] && valuesInTiles[movingTile]==valuesInTiles[destinationTile]){
-                    //we repeat same thing we did in previous if statement, maybe ?
+                else if (spawnedTiles[destinationTile] && spawnedTiles[movingTile] && valuesInTiles[movingTile]==valuesInTiles[destinationTile]){
                     UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
-                    TileMerger(valuesInTiles[destinationTile]);//selects prefab for next merged tile
-                    TilesMover(destinationTile, movingTile);    //moves
-
-
+                    TileMerger(valuesInTiles[destinationTile]);//selects prefab for next merged tile - it is saved in mergedTile
+                    valueInTheNewTile=valuesInTiles[destinationTile]*2;    //Tile merger replaces the value, but it doesnt combine it, so we do it manually
+                    DestroyTileInfo(destinationTile);
+                    DestroyTileInfo(movingTile);
+                    
+                    tileSpawn = Instantiate(mergedTile, newCellPosition, UnityEngine.Quaternion.identity,parentObject.transform);
+                    spawnedTiles[destinationTile] = tileSpawn;
+                    valuesInTiles[destinationTile]= valueInTheNewTile;
+                    fieldRepresenter[destinationTile]=false;
+                    tileProcessed[destinationTile]=true;
+                    allowedTurn=true;
                 }
-
-
             }
         }
 
-        
-
-
-
-        SpawnTile(); //need to have new tile before player is allowed to move
+        if (allowedTurn){
+            SpawnTile(); //need to have new tile before player is allowed to move
+        }
+        allowedTurn=false;
         playerControls.GetComponent<PlayerControls>().AllowPlayerControl=true; //enables player movement only after all previous actions have been taken
     }
 
@@ -144,9 +157,11 @@ public class TilesManager : MonoBehaviour
 
         fieldRepresenter[mover]=true;
         fieldRepresenter[destination]=false;
+        tileProcessed[destination]=true;
     }
 
     public void TileMerger(int previousNumber){
+        previousNumber=previousNumber*2;
         if (previousNumber==2){
             mergedTile=tilePrefabs[0];
         }
@@ -181,5 +196,15 @@ public class TilesManager : MonoBehaviour
             mergedTile=tilePrefabs[10];
         }
     }
+
+    void DestroyTileInfo(int tileNumber){ //
+        GameObject.Destroy(spawnedTiles[tileNumber]);
+        spawnedTiles[tileNumber]=null;
+        valuesInTiles[tileNumber]=0;
+        fieldRepresenter[tileNumber]=true;
+        tileProcessed[tileNumber]=false;
+    }
+
+
 
 }
