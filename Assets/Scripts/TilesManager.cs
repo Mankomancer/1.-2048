@@ -91,7 +91,6 @@ public class TilesManager : MonoBehaviour
     */
 
     public void MoveRight(){
-        
         for (int i=0; i<16; i++){     //reset values for each row. if false then means that can still manipulate this tile
                 tileProcessed[i]=false;
         }
@@ -108,8 +107,6 @@ public class TilesManager : MonoBehaviour
                     CheckTwoTilesMovement(destinationTile+1,movingTile);
                     CheckThreeTilesMovement(destinationTile+2,movingTile);
                 }
-
-
 
                 if ((!spawnedTiles[destinationTile] && spawnedTiles[movingTile]) || (spawnedTiles[destinationTile] && spawnedTiles[movingTile])){ //destination tile needs to be empty, moving tile needs to exists
                     if (needToMoveThreeTiles && needToMoveTwoTiles){
@@ -139,9 +136,6 @@ public class TilesManager : MonoBehaviour
                     }
                 }
 
-
-
-
                 needToMoveThreeTiles=false;
                 needToMoveTwoTiles=false;
             }
@@ -155,9 +149,60 @@ public class TilesManager : MonoBehaviour
     }
 
     public void MoveLeft(){
+        for (int i=0; i<16; i++){     //reset values for each row. if false then means that can still manipulate this tile
+                tileProcessed[i]=false;
+        }
 
-        SpawnTile();
-        playerControls.GetComponent<PlayerControls>().AllowPlayerControl=true;
+        for (int i=0; i<4; i++){    //need to use i*4 - represents which line is used
+            for (int j = 0; j<3; j++){
+                destinationTile=j+i*4;  
+                movingTile=j+1+i*4;
+                if (j==1){  //in case if possible that CAN move 2 field instead of 1.
+                    CheckTwoTilesMovement(destinationTile-1,movingTile);
+                }
+                else if(j==2){  //in case if possible that CAN move 2 or even 3 fields instead of 1
+                    CheckTwoTilesMovement(destinationTile-1,movingTile);
+                    CheckThreeTilesMovement(destinationTile-2,movingTile);
+                }
+
+                if ((!spawnedTiles[destinationTile] && spawnedTiles[movingTile]) || (spawnedTiles[destinationTile] && spawnedTiles[movingTile])){ //destination tile needs to be empty, moving tile needs to exists
+                    if (needToMoveThreeTiles && needToMoveTwoTiles){
+                        destinationTile=destinationTile-2;
+                    }
+                    else if (needToMoveTwoTiles && !needToMoveThreeTiles){
+                        destinationTile=destinationTile-1;
+                    }
+
+                    if (valuesInTiles[movingTile]==valuesInTiles[destinationTile]){ //i know this if and else if is a bit redundant, but i am too lazy atm to bother "optimise" it. especially for this kind of small game where it will not matter
+                        UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
+                        TileMerger(valuesInTiles[destinationTile]);//selects prefab for next merged tile - it is saved in mergedTile
+                        valueInTheNewTile=valuesInTiles[destinationTile]*2;    //save the new tiles value
+                        DestroyTileInfo(destinationTile);   //we dont need old tiles anymore
+                        DestroyTileInfo(movingTile);
+                    
+                        tileSpawn = Instantiate(mergedTile, newCellPosition, UnityEngine.Quaternion.identity,parentObject.transform);
+                        SetTilesInfo(destinationTile);
+                        allowedTurn=true;
+
+                    }
+                    else if((!spawnedTiles[destinationTile] && spawnedTiles[movingTile])){
+                        UnityEngine.Vector2 newCellPosition = new UnityEngine.Vector2(cells[destinationTile].transform.position.x, cells[destinationTile].transform.position.y);
+                        TilesMover(destinationTile, movingTile);
+                        spawnedTiles[destinationTile].transform.position=newCellPosition;
+                        allowedTurn=true;
+                    }
+                }
+
+                needToMoveThreeTiles=false;
+                needToMoveTwoTiles=false;
+            }
+        }
+
+        if (allowedTurn){
+            SpawnTile(); //need to have new tile before player is allowed to move
+        }
+        allowedTurn=false;
+        playerControls.GetComponent<PlayerControls>().AllowPlayerControl=true; //enables player movement only after all previous actions have been taken
     }
 
     public void MoveUp(){
@@ -181,7 +226,7 @@ public class TilesManager : MonoBehaviour
 
         fieldRepresenter[mover]=true;
         fieldRepresenter[destination]=false;
-        tileProcessed[destination]=true;
+        //tileProcessed[destination]=true; turning this off for testing purposes
     }
 
     void CheckTwoTilesMovement(int destination, int mover){ //this doesnt check if tiles between destination are fine, just using to check end points
